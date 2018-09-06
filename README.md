@@ -8,9 +8,9 @@ I think the best way to transform any non-linear problem into a linear one is to
 That's why I aimed 3 main objectives here:
 
 
- 1 - Create a pipeline of ideas and insights of features, where you can see what we've thought before proposing any new feature;
- 2 - Introduce every intuitive and gentle way to construct Machine Learning Models using common tools, such as sklearn;
- 3 - Using the most amazing and iterative visualization tools that you can find on the internet.
+ *1 - Create a pipeline of ideas and insights of features, where you can see what we've thought before proposing any new feature;
+ *2 - Introduce every intuitive and gentle way to construct Machine Learning Models using common tools, such as sklearn;
+ *3 - Using the most amazing and iterative visualization tools that you can find on the internet.
 
 
  Luckly, it will give you some insights for your next challenge!
