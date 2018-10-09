@@ -10,6 +10,40 @@ from plotly.offline import init_notebook_mode, iplot
 import plotly.graph_objs as go
 from plotly.graph_objs import Scatter, Figure, Layout
 
+from sklearn.metrics import mean_squared_log_error as MSLE
+from sklearn.model_selection import KFold
+
+def testa_modelo(df, model, n_splits, retorna_modelo=False, target='SalePrice'):
+    
+    df = df.copy()
+    kf = KFold(n_splits=n_splits)
+    
+    list_metrics = []
+    resultados = pd.DataFrame(index=df.index, columns=['y_val', 'y_prev'])
+    
+    for train_index, val_index in kf.split(df.index):
+        X_train = df.loc[train_index,:].drop(target, axis=1).as_matrix()
+        y_train = df.loc[train_index,target].tolist()
+        
+        X_val = df.loc[val_index].drop(target, axis=1).as_matrix()
+        y_val = df.loc[val_index, target].tolist()
+        
+        model.fit(X_train, y_train)
+        
+        y_prev = model.predict(X_val)
+        
+        y_prev[y_prev<0] = 0
+        
+        resultados.loc[val_index, 'y_val'] = y_val
+        resultados.loc[val_index, 'y_prev'] = y_prev
+        
+        list_metrics.append(np.sqrt(MSLE(y_true=y_val, y_pred=y_prev)))
+        
+    if retorna_modelo:
+        return list_metrics, resultados, model
+    else:
+        return list_metrics, resultados
+
 
 def plot_dataframe(df, columns=None, title='', y_title='', x_title='', Plot=True, campanhas=[], smooth=[False, 0.7]):
     if not columns:
@@ -17,13 +51,13 @@ def plot_dataframe(df, columns=None, title='', y_title='', x_title='', Plot=True
     data = []
     for col in columns:
         if col in campanhas:
-            data.append(go.Scatter(x=df.index, y=df[col], mode='lines+markers', name=col, line={'shape': 'hv'}))
+            data.append(go.Scattergl(x=df.index, y=df[col], mode='lines+markers', name=col, line={'shape': 'hv'}))
         else:
             if smooth[0]:
-                data.append(go.Scatter(x=df.index, y=df[col], mode='lines+markers', name=col, line={'shape': 'spline', 'smoothing': smooth[1]}))
+                data.append(go.Scattergl(x=df.index, y=df[col], mode='lines+markers', name=col, line={'shape': 'spline', 'smoothing': smooth[1]}))
             else:
-                data.append(go.Scatter(x=df.index, y=df[col], mode='lines+markers', name=col))
-    xaxis=dict(title=x_title)#, titlefont=dict(size=18))
+                data.append(go.Scattergl(x=df.index, y=df[col], mode='lines+markers', name=col))
+    xaxis=dict(title=x_title, tickangle=90)#, titlefont=dict(size=18))
     yaxis=dict(title=y_title)#, titlefont=dict(size=18))
     layout = go.Layout(title=title, xaxis=xaxis, yaxis=yaxis)
 #     iplot({"data": data, 'layout': layout})
